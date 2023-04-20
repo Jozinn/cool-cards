@@ -1,8 +1,9 @@
 class GameController < ApplicationController
-    before_action: authenticate_user!
+    before_action :authenticate_user!
     
     def create
         @settings = Setting.create
+        @settings.gameplay = Gameplay.new
         @plyer = current_player
         @player.update(is_host: true)
         @game = Game.new(url: params[:url])
@@ -22,5 +23,10 @@ class GameController < ApplicationController
     def index
         @games = Game.all
         render json: @games
+    end
+
+    def destroy
+        @game = Game.where(url: params[:url])
+        @game.destroy
     end
 end

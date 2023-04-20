@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_04_18_215408) do
+ActiveRecord::Schema[7.0].define(version: 2023_04_19_140731) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -30,14 +30,21 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_18_215408) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "cardpacks_settings", id: false, force: :cascade do |t|
+    t.bigint "cardpack_id", null: false
+    t.bigint "setting_id", null: false
+    t.index ["cardpack_id"], name: "index_cardpacks_settings_on_cardpack_id"
+    t.index ["setting_id"], name: "index_cardpacks_settings_on_setting_id"
+  end
+
   create_table "gameplays", force: :cascade do |t|
     t.bigint "setting_id"
-    t.boolean "write_ins"
-    t.boolean "host_judge"
-    t.boolean "winner_judge"
-    t.integer "players_limit"
-    t.integer "timeout"
-    t.integer "points_to_win"
+    t.boolean "write_ins", default: false
+    t.boolean "host_judge", default: false
+    t.boolean "winner_judge", default: false
+    t.integer "players_limit", default: 12
+    t.integer "timeout", default: 60
+    t.integer "points_to_win", default: 12
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["setting_id"], name: "index_gameplays_on_setting_id"
@@ -50,11 +57,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_18_215408) do
   end
 
   create_table "players", force: :cascade do |t|
-    t.boolean "is_host"
-    t.boolean "is_czar"
-    t.boolean "played"
+    t.boolean "is_host", default: false
+    t.boolean "is_czar", default: false
+    t.boolean "played", default: false
     t.string "name"
-    t.integer "score"
+    t.integer "score", default: 0
     t.bigint "game_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
