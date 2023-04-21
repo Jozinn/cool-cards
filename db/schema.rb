@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_04_19_140731) do
+ActiveRecord::Schema[7.0].define(version: 2023_04_21_194132) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -54,6 +54,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_19_140731) do
     t.string "url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "stage", default: "wait_game"
+    t.integer "current_black"
+  end
+
+  create_table "games_white_cards", id: false, force: :cascade do |t|
+    t.bigint "game_id", null: false
+    t.bigint "white_card_id", null: false
+    t.index ["game_id"], name: "index_games_white_cards_on_game_id"
+    t.index ["white_card_id"], name: "index_games_white_cards_on_white_card_id"
   end
 
   create_table "players", force: :cascade do |t|
@@ -65,7 +74,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_19_140731) do
     t.bigint "game_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "is_winner", default: false
     t.index ["game_id"], name: "index_players_on_game_id"
+  end
+
+  create_table "players_white_cards", id: false, force: :cascade do |t|
+    t.bigint "player_id", null: false
+    t.bigint "white_card_id", null: false
+    t.index ["player_id"], name: "index_players_white_cards_on_player_id"
+    t.index ["white_card_id"], name: "index_players_white_cards_on_white_card_id"
   end
 
   create_table "settings", force: :cascade do |t|
@@ -80,6 +97,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_19_140731) do
     t.string "content"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "highlight", default: true
     t.index ["cardpack_id"], name: "index_white_cards_on_cardpack_id"
   end
 

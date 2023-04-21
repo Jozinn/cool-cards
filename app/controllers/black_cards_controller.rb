@@ -2,7 +2,7 @@ class BlackCardsController < ApplicationController
     def create
         @cardpack = Cardpack.find(params[:id])
         @cardpack.black_cards.create(card_params)
-        render json: @cardpack
+        render json: @cardpack, include: [:black_cards, :white_cards]
     end
 
     def destroy
@@ -10,7 +10,7 @@ class BlackCardsController < ApplicationController
         @id = @black_card.cardpack.id
         @black_card.destroy
         @cardpack = Cardpack.find(@id)
-        render json: @cardpack
+        render json: @cardpack, include: [:white_cards, :black_cards]
     end
 
     private

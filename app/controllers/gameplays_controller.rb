@@ -1,7 +1,9 @@
 class GameplaysController < ApplicationController
     def edit
-        @gameplay = Gameplay.find(params[:id])
+        @game = Game.find(params[:id])
+        @gameplay = @game.settings.gameplay
         @gameplay.update(gameplay_params)
+        render json: @game, include: [:players, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]
     end
 
     private

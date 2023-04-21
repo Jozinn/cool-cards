@@ -7,12 +7,13 @@ class PlayersController < ApplicationController
             login @player
             render json: @player
         else 
-            render json: @player, status: :unprocessable_entity
+            render json: @player.errors, status: :unprocessable_entity
         end
     end
 
     def destroy
-        @player = Player.find(params[:id])
+        @player = current_player
+        @player.white_cards.clear
         logout
         @played.destroy
     end
