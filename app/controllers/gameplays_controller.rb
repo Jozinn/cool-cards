@@ -1,5 +1,5 @@
 class GameplaysController < ApplicationController
-    def edit
+    def update
         @game = Game.find(params[:id])
         @gameplay = @game.settings.gameplay
         @gameplay.update(gameplay_params)

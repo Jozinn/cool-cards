@@ -1,6 +1,7 @@
 class Player < ApplicationRecord
     belongs_to :game
     has_and_belongs_to_many :white_cards
+    validates :name, presence: true
 
     attr_accessor :cards_played, :whites
 

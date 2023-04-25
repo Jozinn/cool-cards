@@ -6,7 +6,7 @@ class GameController < ApplicationController
         @settings.gameplay = Gameplay.new
         @plyer = current_player
         @player.update(is_host: true)
-        @game = Game.new(url: params[:url])
+        @game = Game.new(url: params[:id])
         @game.settings = @settings
         @game.players << @player
         render json: @game, include: [:players, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}, :current_whites]
@@ -26,12 +26,12 @@ class GameController < ApplicationController
     end
 
     def destroy
-        @game = Game.where(url: params[:url])
+        @game = Game.where(url: params[:id])
         @game.destroy
     end
 
     def start
-        @game = Game.where(url: params[:url])
+        @game = Game.where(url: params[:id])
         @game.players.each do |player|
             player.get_hand
             if player.is_host == true
@@ -43,7 +43,7 @@ class GameController < ApplicationController
     end
 
     def start_round
-        @game = Game.where(url: params[:url])
+        @game = Game.where(url: params[:id])
         @game.update(stage: 'play', kick: nil, current_black: @game.set_current_black)
         @game.current_whites.clear
         @game.players.each do |player| 
@@ -54,7 +54,7 @@ class GameController < ApplicationController
     end
 
     def play
-        @game = Game.where(url: params[:url])
+        @game = Game.where(url: params[:id])
         @player = current_player
         return if @player.is_czar
         @card = WhiteCard.find(params[:card])
@@ -69,7 +69,7 @@ class GameController < ApplicationController
     end
 
     def choose
-        @game = Game.where(url: params[:url])
+        @game = Game.where(url: params[:id])
         @player = current_player
         @card = WhiteCard.find(params[:card])
         return unless @player.is_czar
@@ -95,7 +95,7 @@ class GameController < ApplicationController
     end
 
     def kick
-        @game = Game.where(url: params[:url])
+        @game = Game.where(url: params[:id])
         @player = Player.find(params[:player])
         @game.players.delete(@player)
         @game.update(kick: @player.id)
@@ -103,7 +103,7 @@ class GameController < ApplicationController
     end
 
     def show_up
-        @game = Game.where(url: params[:url])
+        @game = Game.where(url: params[:id])
         @game.update(stage: 'showup')
         ActionCable.server.broadcast('game', @game.as_json(include: [:players, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}, :current_whites]))
     end
