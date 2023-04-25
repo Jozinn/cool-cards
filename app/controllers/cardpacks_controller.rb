@@ -1,4 +1,6 @@
 class CardpacksController < ApplicationController
+    before_action :authenticate_admin!, only: [:create, :destroy]
+
     def create
         @cardpack = Cardpack.new
         if @cardpack.save

@@ -2,13 +2,18 @@ class Player < ApplicationRecord
     belongs_to :game
     has_and_belongs_to_many :white_cards
 
+    attr_accessor :cards_played, :whites
+
+    @cards_played = 0
+    @whites = []
+
     def draw_card
         game = self.game
         return nil unless game
         cardpack = game.settings.cardpacks[rand(game.settings.cardpacks.size)]
         card = cardpack.white_cards[rand(cardpack.white_cards.size)]
         if card.players.empty?
-            self.white_cards << card
+            self.whites << card
         else
             draw_card()
         end
@@ -22,8 +27,9 @@ class Player < ApplicationRecord
 
     def play(card)
         c = WhiteCard.find(card)
-        self.white_cards.delete(c)
+        self.white_cards << c
+        self.whites.delete(c)
         draw_card()
-        self.update(played: true)
+        @cards_played += 1
     end
 end

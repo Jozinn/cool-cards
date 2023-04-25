@@ -1,4 +1,6 @@
 class WhiteCardsController < ApplicationController
+    before_action :authenticate_admin!
+
     def create
         @cardpack = Cardpack.find(params[:id])
         @cardpack.white_cards.create(content: content)

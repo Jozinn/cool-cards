@@ -4,7 +4,7 @@ class PlayersController < ApplicationController
     def create
         @player = Player.new(name: params[:name])
         if @player.save
-            login @player
+            login_player @player
             render json: @player
         else 
             render json: @player.errors, status: :unprocessable_entity
@@ -14,7 +14,7 @@ class PlayersController < ApplicationController
     def destroy
         @player = current_player
         @player.white_cards.clear
-        logout
+        logout_player
         @played.destroy
     end
 
