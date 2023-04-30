@@ -1,7 +1,7 @@
 class Admin < ApplicationRecord
     validates :email, uniqueness: true
     validates :email, presence: true
-    validates :password, length: { minimum: 8 }
+    #validates :password, length: { minimum: 8 }
 
 
     def password

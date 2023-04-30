@@ -2,7 +2,7 @@ class CardpacksController < ApplicationController
     before_action :authenticate_admin!, only: [:create, :destroy]
 
     def create
-        @cardpack = Cardpack.new
+        @cardpack = Cardpack.new(name: params[:name], author: current_admin.id)
         if @cardpack.save
             render json: @cardpack, include: [:white_cards, :black_cards]
         else

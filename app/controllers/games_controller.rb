@@ -1,5 +1,5 @@
-class GameController < ApplicationController
-    before_action :authenticate_user!
+class GamesController < ApplicationController
+    before_action :authenticate_player!
     
     def create
         @settings = Setting.create
@@ -9,7 +9,7 @@ class GameController < ApplicationController
         @game = Game.new(url: params[:id])
         @game.settings = @settings
         @game.players << @player
-        render json: @game, include: [:players, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}, :current_whites]
+        render json: @game, include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]
     end
 
     def show
@@ -17,7 +17,7 @@ class GameController < ApplicationController
         unless @game.players.exists?(current_player)
             @game.players << current_player
         end
-        render json: @game, include: [:players, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}, :current_whites]
+        render json: @game, include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]
     end
 
     def index
@@ -32,6 +32,7 @@ class GameController < ApplicationController
 
     def start
         @game = Game.where(url: params[:id])
+        return unless @game.players.size >= 3
         @game.players.each do |player|
             player.get_hand
             if player.is_host == true
@@ -39,7 +40,7 @@ class GameController < ApplicationController
             end
         end
         @game.update(stage: 'wait_round')
-        ActionCable.server.broadcast('game', @game.as_json(include: [:players, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}, :current_whites]))
+        ActionCable.server.broadcast('game', @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     end
 
     def start_round
@@ -50,7 +51,7 @@ class GameController < ApplicationController
             player.white_cards.clear
             player.update(played: false)
         end
-        ActionCable.server.broadcast('game', @game.as_json(include: [:players, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}, :current_whites]))
+        ActionCable.server.broadcast('game', @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     end
 
     def play
@@ -76,7 +77,7 @@ class GameController < ApplicationController
         @card.players[0].update(score: @card.players[0].score + 1)
         @player.update(is_czar: false)
         @card.update(highlight: true)
-        ActionCable.server.broadcast('game', @game.as_json(include: [:players, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}, :current_whites]))
+        ActionCable.server.broadcast('game', @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
         sleep 10
         @card.update(highlight: false)
         @game.update(stage: 'wait_round')
@@ -91,7 +92,7 @@ class GameController < ApplicationController
             @new_czar = Player.find(@new_czar_index)
             @new_czar.update(is_czar: true)
         end
-        ActionCable.server.broadcast('game', @game.as_json(include: [:players, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}, :current_whites]))
+        ActionCable.server.broadcast('game', @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     end
 
     def kick
@@ -99,12 +100,12 @@ class GameController < ApplicationController
         @player = Player.find(params[:player])
         @game.players.delete(@player)
         @game.update(kick: @player.id)
-        ActionCable.server.broadcast('game', @game.as_json(include: [:players, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}, :current_whites]))
+        ActionCable.server.broadcast('game', @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     end
 
     def show_up
         @game = Game.where(url: params[:id])
         @game.update(stage: 'showup')
-        ActionCable.server.broadcast('game', @game.as_json(include: [:players, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}, :current_whites]))
+        ActionCable.server.broadcast('game', @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     end
 end

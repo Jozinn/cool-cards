@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
   mount ActionCable.server => '/cable'
-  root to: 'game#index'
+  root to: 'sessions#destroy'
   resources :admins, only: [:create, :update]
   resources :black_cards, only: [:create, :destroy]
   resources :cardpacks, only: [:create, :destroy, :index, :show]
