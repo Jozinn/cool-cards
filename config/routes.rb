@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   resources :gameplays, only: :update
   resources :players, only: [:create, :destroy, :show]
   resources :sessions, only: :create
+  delete '/sessions', to: 'sessions#destroy'
   resources :settings, only: [:update, :destroy]
   resources :white_cards, only: [:create, :destroy]
   resources :games, only: [:create, :destroy, :index, :show]

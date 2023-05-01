@@ -2,7 +2,7 @@ class WhiteCardsController < ApplicationController
     before_action :authenticate_admin!
 
     def create
-        @cardpack = Cardpack.find(params[:id])
+        @cardpack = Cardpack.find(params[:cardpack])
         @cardpack.white_cards.create(content: content)
         render json: @cardpack, include: [:white_cards, :black_cards]
     end

@@ -5,7 +5,7 @@ class AdminsController < ApplicationController
         @admin = Admin.new(admin_params)
         if @admin.save
             login_admin(@admin)
-            render json: @admin, only: :name
+            render json: @admin, except: :password
         else
             render json: @admin.errors, ststus: :unprocessable_entity
         end
