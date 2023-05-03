@@ -1,5 +1,5 @@
 class Player < ApplicationRecord
-    belongs_to :game
+    #belongs_to :game
     has_and_belongs_to_many :white_cards
     validates :name, presence: true
 
@@ -32,5 +32,9 @@ class Player < ApplicationRecord
         self.whites.delete(c)
         draw_card()
         @cards_played += 1
+    end
+
+    def played_reset
+        @cards_played = 0
     end
 end

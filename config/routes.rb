@@ -6,12 +6,12 @@ Rails.application.routes.draw do
   resources :black_cards, only: [:create, :destroy]
   resources :cardpacks, only: [:create, :destroy, :index, :show]
   resources :gameplays, only: :update
-  resources :players, only: [:create, :destroy, :show]
+  resources :players, only: [:create, :destroy, :show, :update]
   resources :sessions, only: :create
   delete '/sessions', to: 'sessions#destroy'
   resources :settings, only: [:update, :destroy]
   resources :white_cards, only: [:create, :destroy]
-  resources :games, only: [:create, :destroy, :index, :show]
+  resources :games, only: [:create, :destroy, :index, :show, :update]
   get '/games/:id/start', to: 'games#start'
   get '/games/:id/start_round', to: 'games#start_round'
   get '/games/:id/play/:card', to: 'games#play'
