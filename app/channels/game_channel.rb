@@ -10,6 +10,6 @@ class GameChannel < ApplicationCable::Channel
   end
 
   def receive(data)
-    ActionCable.server.broadcast_to(@game, data)
+    GameChannel.broadcast_to(@game, data)
   end
 end

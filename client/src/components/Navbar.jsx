@@ -6,9 +6,8 @@ function Navbar() {
     <div className='flex justify-around px-4 border-b-2 border-slate-500'>
         <Link to='/'>Home</Link>
         <div className='flex justify-between'>
-            <Link>Play now!</Link>
-            <Link>Cardpacks</Link>
-            <Link>Login</Link>
+            <Link to='/customcards'>Cardpacks</Link>
+            <Link to='/admin'>Login</Link>
         </div>
     </div>
   )

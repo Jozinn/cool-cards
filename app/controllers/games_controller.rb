@@ -44,15 +44,15 @@ class GamesController < ApplicationController
             end
         end
         @game.update(stage: 'wait_round')
-        ActionCable.server.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
+        GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     end
 
     def update
-        @game = Game.find(params[:id])
+        @game = Game.find_by(url: params[:id])
         if @game.update(game_params)
-            ActionCable.server.broadcast('game', @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
+            GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
         else
-            ActionCable.server.broadcast(@game, @game.errors)
+            GameChannel.broadcast_to(@game, @game.errors)
         end
     end
 
@@ -69,7 +69,7 @@ class GamesController < ApplicationController
     #         player.white_cards.clear
     #         player.update(played: false)
     #     end
-    #     ActionCable.server.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
+    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     # end
 
     # def play
@@ -95,7 +95,7 @@ class GamesController < ApplicationController
     #     @card.players[0].update(score: @card.players[0].score + 1)
     #     @player.update(is_czar: false)
     #     @card.update(highlight: true)
-    #     ActionCable.server.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
+    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     #     sleep 10
     #     @card.update(highlight: false)
     #     @game.update(stage: 'wait_round')
@@ -110,7 +110,7 @@ class GamesController < ApplicationController
     #         @new_czar = Player.find(@new_czar_index)
     #         @new_czar.update(is_czar: true)
     #     end
-    #     ActionCable.server.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
+    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     # end
 
     # def kick
@@ -118,12 +118,12 @@ class GamesController < ApplicationController
     #     @player = Player.find(params[:player])
     #     @game.players.delete(@player)
     #     @game.update(kick: @player.id)
-    #     ActionCable.server.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
+    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     # end
 
     # def show_up
     #     @game = Game.find_by(url: params[:id])
     #     @game.update(stage: 'showup')
-    #     ActionCable.server.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
+    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     # end
 end
