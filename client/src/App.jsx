@@ -10,7 +10,7 @@ import CustomCards from './components/CustomCards';
 
 function App() {
   return (
-    <div className='bg-slate-200 flex flex-col justify-between items-center'>
+    <div className='bg-slate-200 flex flex-col justify-between items-center font-helvetica'>
       <Navbar />
       <BrowserRouter>
         <Routes>
