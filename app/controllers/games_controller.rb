@@ -6,27 +6,27 @@ class GamesController < ApplicationController
         @settings.gameplay = Gameplay.new
         @player = current_player
         @player.update(is_host: true)
-        @game = Game.new(url: params[:id])
+        @game = Game.new
         @game.settings = @settings
         @game.players << @player
         if @game.save
-            render json: @game, include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]
+            render json: @game, include: [:players, :current_whites, :current_black, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]
         else
             render json: @game.errors, status: :unprocessable_entity
         end        
     end
 
     def show
-        @game = Game.find_by(url: params[:id])
+        @game = Game.find(params[:id])
         unless @game.players.exists?(current_player) && @game.players.size < @game.settings.gameplay.players_limit
             @game.players << current_player
         end
-        render json: @game, include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]
+        render json: @game, include: [:players, :current_whites, :current_black, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]
     end
 
     def index
         @games = Game.all
-        render json: @games
+        render json: @games, include: [:players, :current_whites, :current_black, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]
     end
 
     def destroy
@@ -35,7 +35,7 @@ class GamesController < ApplicationController
     end
 
     def start
-        @game = Game.find_by(url: params[:id])
+        @game = Game.find(params[:id])
         return unless @game.players.size >= 3
         @game.players.each do |player|
             player.get_hand
@@ -44,13 +44,16 @@ class GamesController < ApplicationController
             end
         end
         @game.update(stage: 'wait_round')
-        GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
+        GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :current_black, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     end
 
     def update
-        @game = Game.find_by(url: params[:id])
+        @game = Game.find(params[:id])
+        if params[:set_black]
+            @game.set_current_black
+            render json: @game, include: [:players, :current_whites, :current_black, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]
         if @game.update(game_params)
-            GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
+            GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :current_black, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
         else
             GameChannel.broadcast_to(@game, @game.errors)
         end
@@ -58,7 +61,7 @@ class GamesController < ApplicationController
 
     private
     def game_params
-        params.require(:game).permit(:url, :stage, :current_blacks, :kick)
+        params.require(:game).permit(:url, :stage, :current_whites, :kick)
     end
 
     # def start_round
@@ -69,7 +72,7 @@ class GamesController < ApplicationController
     #         player.white_cards.clear
     #         player.update(played: false)
     #     end
-    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
+    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :current_black, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     # end
 
     # def play
@@ -95,7 +98,7 @@ class GamesController < ApplicationController
     #     @card.players[0].update(score: @card.players[0].score + 1)
     #     @player.update(is_czar: false)
     #     @card.update(highlight: true)
-    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
+    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :current_black, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     #     sleep 10
     #     @card.update(highlight: false)
     #     @game.update(stage: 'wait_round')
@@ -110,7 +113,7 @@ class GamesController < ApplicationController
     #         @new_czar = Player.find(@new_czar_index)
     #         @new_czar.update(is_czar: true)
     #     end
-    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
+    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :current_black, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     # end
 
     # def kick
@@ -118,12 +121,12 @@ class GamesController < ApplicationController
     #     @player = Player.find(params[:player])
     #     @game.players.delete(@player)
     #     @game.update(kick: @player.id)
-    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
+    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :current_black, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     # end
 
     # def show_up
     #     @game = Game.find_by(url: params[:id])
     #     @game.update(stage: 'showup')
-    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
+    #     GameChannel.broadcast_to(@game, @game.as_json(include: [:players, :current_whites, :current_black, :settings => {include: [:gameplay, :cardpacks => {include: [:white_cards, :black_cards]}]}]))
     # end
 end

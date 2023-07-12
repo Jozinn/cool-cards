@@ -13,11 +13,11 @@ Rails.application.routes.draw do
   resources :white_cards, only: [:create, :destroy]
   resources :games, only: [:create, :destroy, :index, :show, :update]
   get '/games/:id/start', to: 'games#start'
-  get '/games/:id/start_round', to: 'games#start_round'
-  get '/games/:id/play/:card', to: 'games#play'
-  get '/games/:id/choose/:card', to: 'games#choose'
-  get '/games/:id/kick/:player', to: 'games#kick'
-  get '/games/:id/show_up', to: 'games#show_up'
+  # get '/games/:id/start_round', to: 'games#start_round'
+  # get '/games/:id/play/:card', to: 'games#play'
+  # get '/games/:id/choose/:card', to: 'games#choose'
+  # get '/games/:id/kick/:player', to: 'games#kick'
+  # get '/games/:id/show_up', to: 'games#show_up'
   # Defines the root path route ("/")
   # root "articles#index"
 end

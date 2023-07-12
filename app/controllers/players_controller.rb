@@ -13,6 +13,11 @@ class PlayersController < ApplicationController
 
     def update
         @player = Player.find(params[:id])
+        if params[:play]
+            @card = params[:card]
+            @player.play(@card)
+            render json: @player
+        end
         if @player.update(player_params)
             render json: @player
         else

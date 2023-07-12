@@ -27,14 +27,14 @@ class Player < ApplicationRecord
     end
 
     def play(card)
+        if @cards_played == self.game.current_black.white_number
+            return nil
+        end
         c = WhiteCard.find(card)
-        self.white_cards << c
+        self.game.current_whites << c
         self.whites.delete(c)
         draw_card()
         @cards_played += 1
     end
 
-    def played_reset
-        @cards_played = 0
-    end
 end

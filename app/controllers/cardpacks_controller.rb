@@ -16,8 +16,8 @@ class CardpacksController < ApplicationController
     end
 
     def index
-        @cardpacks = Cardpack.all
-        render json: @cardpacks
+        @cardpacks = Cardpack.where(author: params[:admin])
+        render json: @cardpacks, include: [:white_cards, :black_cards]
     end
 
     def show
